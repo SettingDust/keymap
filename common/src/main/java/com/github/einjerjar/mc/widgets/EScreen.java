@@ -5,15 +5,14 @@ import com.github.einjerjar.mc.widgets.utils.ColorGroups;
 import com.github.einjerjar.mc.widgets.utils.Point;
 import com.github.einjerjar.mc.widgets.utils.Rect;
 import com.mojang.blaze3d.platform.InputConstants;
+import java.util.List;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Optional;
 
 @Accessors(fluent = true, chain = true)
 public abstract class EScreen extends Screen {
@@ -159,14 +158,14 @@ public abstract class EScreen extends Screen {
         return onMouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
-    public boolean onMouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean onMouseScrolled(double mouseX, double mouseY, final double scrollX, final double scrollY) {
         if (hoveredWidget == null) return false;
-        return hoveredWidget.mouseScrolled(mouseX, mouseY, amount);
+        return hoveredWidget.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
-        return onMouseScrolled(mouseX, mouseY, amount);
+    public boolean mouseScrolled(final double mouseX, final double mouseY, final double scrollX, final double scrollY) {
+        return onMouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     public List<EWidget> widgets() {
@@ -178,7 +177,7 @@ public abstract class EScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (renderBg) renderBackground(guiGraphics);
+        if (renderBg) renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         preRenderScreen(guiGraphics, mouseX, mouseY, partialTick);
         hoveredWidget = null;
         if (autoRenderChild) {

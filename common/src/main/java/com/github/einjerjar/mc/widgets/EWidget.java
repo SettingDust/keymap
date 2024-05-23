@@ -183,9 +183,9 @@ public abstract class EWidget implements Renderable, GuiEventListener, Narratabl
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(final double mouseX, final double mouseY, final double scrollX, final double scrollY) {
         if (!enabled) return false;
-        return onMouseScrolled(mouseX, mouseY, delta);
+        return onMouseScrolled(mouseX, mouseY, scrollY);
     }
 
     // ------------------------------------

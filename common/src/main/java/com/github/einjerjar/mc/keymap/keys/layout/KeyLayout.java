@@ -3,22 +3,17 @@ package com.github.einjerjar.mc.keymap.keys.layout;
 import com.github.einjerjar.mc.keymap.Keymap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import java.io.IOException;
+import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Stream;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.FileToIdConverter;
 
 /**
  * Layout instance, and Registry of layouts for the mod
@@ -94,65 +89,23 @@ public class KeyLayout {
     /**
      * Loads all the predefined layouts from the mod
      */
-    public static void loadKeys() {
+    public static void loadKeys() throws IOException {
         layouts.clear();
+
+        var resourceManager = Minecraft.getInstance().getResourceManager();
+        var keymapLayouts = FileToIdConverter.json("keymap_layouts").listMatchingResources(resourceManager);
 
         GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
         Gson gson = builder.create();
-        ClassLoader loader = KeyLayout.class.getClassLoader();
-        Stream<Path> files = null;
-        FileSystem fs;
 
-        try {
-            Keymap.logger().warn(loader.getResource("/"));
-            Keymap.logger().warn(loader.getResource(LAYOUT_ROOT));
-            URI layoutUri = Objects.requireNonNull(
-                    Objects.requireNonNull(loader.getResource(LAYOUT_ROOT)).toURI());
-            Keymap.logger().warn("Keymap layout stream: {}", layoutUri);
-            Keymap.logger().warn("Keymap layout stream scheme: {}", layoutUri.getScheme());
-            Path path;
-            if (layoutUri.getScheme().equals("jar")) {
-                fs = getFileSystem(layoutUri);
-                path = fs.getPath(LAYOUT_ROOT);
-            } else {
-                path = Path.of(layoutUri);
+        for (final var entry : keymapLayouts.entrySet()) {
+            try {
+                Keymap.logger().info("Load layout {}", entry.getKey());
+                registerLayout(gson.fromJson(entry.getValue().openAsReader(), KeyLayout.class));
+            } catch (JsonSyntaxException | JsonIOException | IOException e) {
+                Keymap.logger().error("Failed to load keymap layout {}", entry.getKey(), e);
             }
-
-            files = Files.walk(path, 1);
-
-            for (Iterator<Path> it = files.iterator(); it.hasNext(); ) {
-                Path p = it.next();
-                if (!p.getFileName().toString().endsWith(".json")) continue;
-                tryLoadLayout(gson, loader, p);
-            }
-        } catch (Exception e) {
-            Keymap.logger().error(e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (files != null) files.close();
         }
-    }
-
-    private static void tryLoadLayout(Gson gson, ClassLoader loader, Path p) {
-        try (InputStreamReader reader = new InputStreamReader(
-                Objects.requireNonNull(loader.getResourceAsStream(p.toString())), StandardCharsets.UTF_8)) {
-            registerLayout(gson.fromJson(reader, KeyLayout.class));
-        } catch (Exception e) {
-            Keymap.logger().warn("Can't load {} ; {}", p.getFileName(), e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private static FileSystem getFileSystem(URI layoutUri) throws IOException {
-        FileSystem fs;
-        try {
-            fs = FileSystems.getFileSystem(layoutUri);
-            Keymap.logger().info("GET_FS");
-        } catch (Exception e) {
-            fs = FileSystems.newFileSystem(layoutUri, Collections.emptyMap());
-            Keymap.logger().info("NEW_FS");
-        }
-        return fs;
     }
 
     /**

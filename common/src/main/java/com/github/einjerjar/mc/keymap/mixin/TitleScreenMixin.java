@@ -8,6 +8,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.IOException;
+
 /**
  * Best way I can think of to register the saved combos, without
  * having to open world to allow changing of the keybinds via settings
@@ -21,7 +23,7 @@ public class TitleScreenMixin {
      * @param ci CallbackInfo
      */
     @Inject(at = @At("HEAD"), method = "init")
-    private void onInit(CallbackInfo ci) {
+    private void onInit(CallbackInfo ci) throws IOException {
         KeyLayout.loadKeys();
         KeymapRegistry.load();
     }

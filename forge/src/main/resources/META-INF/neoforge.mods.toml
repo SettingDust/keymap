@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[40,)"
+loaderVersion = "[2,)"
 #issueTrackerURL = ""
 license = "ISC"
 
@@ -7,16 +7,16 @@ license = "ISC"
 modId = "keymap"
 version = "${version}"
 displayName = "keymap"
-authors = "Einjerjar"
+authors = "Einjerjar, SettingDust"
 description = '''
 keymap
 '''
 logoFile = "icon.png"
 
 [[dependencies.keymap]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "[40,)"
+versionRange = "[20,)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -26,3 +26,6 @@ mandatory = true
 versionRange = "[1.18.2,)"
 ordering = "NONE"
 side = "BOTH"
+
+[[mixins]]
+config = "keymap-common.mixins.json"

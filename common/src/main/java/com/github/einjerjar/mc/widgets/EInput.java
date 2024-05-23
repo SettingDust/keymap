@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
+import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 @Accessors(fluent = true)
@@ -100,7 +101,7 @@ public class EInput extends EWidget {
 
     @Override
     protected boolean onCharTyped(char codePoint, int modifiers) {
-        if (SharedConstants.isAllowedChatCharacter(codePoint)) {
+        if (StringUtil.isAllowedChatCharacter(codePoint)) {
             write(codePoint);
             return true;
         }

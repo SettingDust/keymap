@@ -2,20 +2,20 @@ package com.github.einjerjar.mc.keymapforge;
 
 import com.github.einjerjar.mc.keymap.Keymap;
 import com.github.einjerjar.mc.keymap.client.gui.screen.ConfigScreen;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ConfigScreenHandler;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLPaths;
-
 import java.io.File;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 @Mod(Keymap.MOD_ID)
 public class KeymapForge {
     public KeymapForge() {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> IDK::clientInit);
-        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> IDK::serverInit);
+        switch (FMLEnvironment.dist) {
+            case CLIENT -> IDK.clientInit();
+            case DEDICATED_SERVER -> IDK.serverInit();
+        }
     }
 
     public static File configDirProvider(String name) {
@@ -35,9 +35,7 @@ public class KeymapForge {
 
             ModLoadingContext.get()
                     .registerExtensionPoint(
-                            ConfigScreenHandler.ConfigScreenFactory.class,
-                            () -> new ConfigScreenHandler.ConfigScreenFactory(
-                                    (minecraft, parent) -> new ConfigScreen(parent)));
+                            IConfigScreenFactory.class, () -> (minecraft, parent) -> new ConfigScreen(parent));
         }
     }
 }

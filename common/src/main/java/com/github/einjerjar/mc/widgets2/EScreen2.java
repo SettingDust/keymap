@@ -89,7 +89,7 @@ public abstract class EScreen2 extends EScreen2Utils {
     }
 
     protected void preRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        renderBackground(guiGraphics);
+        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     protected void onRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -180,8 +180,8 @@ public abstract class EScreen2 extends EScreen2Utils {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        return onMouseScrolled(mouseX, mouseY, delta);
+    public boolean mouseScrolled(final double mouseX, final double mouseY, final double scrollX, final double scrollY) {
+        return onMouseScrolled(mouseX, mouseY, scrollY);
     }
 
     @Override
